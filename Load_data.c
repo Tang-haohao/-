@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include<conio.h>
+#include <limits.h>
 #include "Parameter.h"
 #include "load_data.h"
 
@@ -24,9 +25,9 @@ pNODE loadNode(char filename[]){
 	file = fopen(filename,"r");
     if(file == NULL)
     {
-        printf("Failed to read file, press any key to exit\n"); 
+        printf("\nFailed to read file, press any key to exit"); 
         getch();//不回显函数     
-        exit(1);
+		return NULL;
     }
 	fgets(row, 200, file);		//读取文件	
 	str = strtok(row,BLANK);	//strtok()用来将字符串分割成一个个片段
@@ -79,14 +80,16 @@ pPATH loadPath(char filename[]){
     FILE* file = fopen(filename,"r");
     if(file == NULL)
     {
-        printf("Failed to read file, press any key to exit\n"); 
+        printf("\nFailed to read file, press any key to exit"); 
         getch();//不回显函数     
-        exit(1);
+		return NULL;
     }
     
     fgets(row, 200, file);	  //neglect the first line	
     fgets(row, 200, file);
-     						  //向链表的节点中赋值                          
+    str = strtok(row,BLANK);
+    
+    //向链表的节点中赋值                          
     while (strcmp("<link",str) == 0) {
         pPATH path_new=(pPATH) malloc(sizeof(Path)); 
         str = strtok(NULL, BLANK);
@@ -114,11 +117,6 @@ pPATH loadPath(char filename[]){
     return head_pPath;
 }
 
-
-
-
-
-
 pMyGraph produceGraph(pPATH path_head,pNODE node_head){
   	pPATH path_p=path_head;
   	pNODE node_p=node_head;
@@ -126,14 +124,18 @@ pMyGraph produceGraph(pPATH path_head,pNODE node_head){
   	int counteri, counterj, counterx;
   	int fir_n, sec_n;
   	graph_p->node_number=0;
+  	if(path_p==NULL||node_p==NULL){
+  		return NULL;
+	  }
     while (node_p->Nextnode!=NULL) {
         graph_p->node_number=graph_p->node_number+1;	//计算有多少个node 
-        node_p=node_p->Nextnode;
+		node_p=node_p->Nextnode;
     }
-	graph_p->edge_number=0;	
+	graph_p->edge_number=0;
+
     while (path_p->Nextpath!=NULL) {
         graph_p->edge_number=graph_p->edge_number+1;	//计算有多少条path 
-        path_p=path_p->Nextpath;
+		path_p=path_p->Nextpath;
     }
     for ( counteri=0; counteri<graph_p->node_number; counteri++)
 	{
@@ -141,10 +143,10 @@ pMyGraph produceGraph(pPATH path_head,pNODE node_head){
 		{
             if (counterj!=counteri) 
 			{
-                graph_p-> edges[counteri][counterj]=INF;	//距离为INF说明两个node之间没有直接相连的路 
+                graph_p-> edges[counteri][counterj]=INT_MAX;	//距离为INF说明两个node之间没有直接相连的路 
             }
             else 
-			{
+			{	
 				graph_p-> edges[counteri][counterj]=0;		//相同的node间距离为零 
 			}
         }
@@ -153,7 +155,7 @@ pMyGraph produceGraph(pPATH path_head,pNODE node_head){
     for ( counterx=0; counterx<graph_p->edge_number; counterx++) {
     	//寻找first_node对应的index 
       	pNODE node_p2=node_head;	//为什么马成晓要写pNODE node_p2=node_head->Nextnode
-    	int index=0,aindex=-1,bindex=-1;	//如果aindex或bindex后面依然是-1说明没找到对应的点 
+		int index=0,aindex=-1,bindex=-1;	//如果aindex或bindex后面依然是-1说明没找到对应的点 
     	while (node_p2->Nextnode!=NULL) 
 	   	{
     	    if (node_p2->node_id==path_p->first_node) 
@@ -186,7 +188,7 @@ pMyGraph produceGraph(pPATH path_head,pNODE node_head){
 		//给图像数组赋值 
         graph_p->edges[aindex][bindex]=path_p->length;
         graph_p->edges[bindex][aindex]=path_p->length;
-        path_p=path_p->Nextpath;
+		path_p=path_p->Nextpath;
     }	 
  	return graph_p; 
 }

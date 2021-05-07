@@ -2,6 +2,6 @@
 #define DRAWGRAPH_H
 
 
-void drawgraph();
+int drawgraph();
 
 #endif

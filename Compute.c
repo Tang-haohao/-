@@ -1,143 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include "Parameter.h"
+#include "load_data.h"
+#include "auxiliary_function.h"
+#include "Compute.h"
 #define NUM 7
- 
-//typedef struct MGraph		/* 邻接表存储结构 */
-//{
-//     int edges[NUM][NUM];
-//     int n;  //node number
-//	 int e;	 //edge	number
-//} MGraph;
 
-typedef struct MyGraph		/* 邻接表存储结构 */
-{
-     int edges[MAX][MAX];
-     int node_number;  //node number
-	 int edge_number;  //edge number
-} MyGraph;
 
-typedef MyGraph* pMyGraph; 
-
- 
-//MGraph *build_mgraph();
-void Dijkstra(MGraph *mgraph, int v);
-void Dispath(int dis[],int pre[],int visited[], int n, int v);
-void Ppath(int path[], int i, int v);
-int main(void)
-{
-     MGraph *mgraph;
- 
-//     printf("\n*************************************************************\n");
-//     printf("该图的矩阵表示为:\n");
-//     mgraph=build_mgraph();
-     printf("\n*************************************************************\n");
-     printf("dijkstra 算法:\n");
-     Dijkstra(mgraph,0);
-     printf("\n*************************************************************\n");
-     
-     return 0;
-}
- 
-//MGraph *build_mgraph()
-//{
-//     int i,j;
-//     int num_e=0;
-//     MGraph *mgraph=(MGraph *)malloc(sizeof(MGraph));
-//     int matrix[NUM][NUM]={{0,4,6,6,INT_MAX,INT_MAX,INT_MAX},
-//			   {INT_MAX,0,1,INT_MAX,7,INT_MAX,INT_M      AX},
-//			   {INT_MAX,INT_MAX,0,INT_MAX,6,4,INT_MAX},
-//			   {INT_MAX,INT_MAX,2,0,INT_MAX,5,INT_MAX},
-//			   {INT_MAX,INT_MAX,INT_MAX,INT_MAX,0,INT_MAX,6},
-//			   {INT_MAX,INT_MAX,INT_MAX,INT_MAX,1,0,8},
-//			   {INT_MAX,INT_MAX,INT_MAX,INT_MAX,INT_MAX,INT_MAX,0}};
-//     for(i=0;i<NUM;i++)
-//     {
-//	  for(j=0;j<NUM;j++)
-//	  {
-//	       mgraph->edges[i][j]=matrix[i][j];
-//	       if(matrix[i][j]!=0 && matrix[i][j]!=INT_MAX)
-//		    num_e++;
-//	  }
-//     }
-//     mgraph->n=NUM;
-//     mgraph->e=num_e;
-// 
-//     printf("node=%d;edges=%d\n",mgraph->n,mgraph->e);
-//     for(i=0;i<NUM;i++)
-//     {
-//	  for(j=0;j<NUM;j++)
-//	  {
-//	       if(mgraph->edges[i][j]!=INT_MAX)
-//		    printf("%3d",mgraph->edges[i][j]);
-//	       else
-//		    printf("%3c",'&');
-//	  }
-//	  printf("\n");
-//     }
-// 
-//     return mgraph;
-//}
-
-pMyGraph mgraph=produceGraph(pPATH path_head,pNODE node_head);
-
-void Dijkstra(MGraph *mgraph, int v)
+double Dijkstra(pMyGraph mgraph, int v, int m)
 {  
      int icounter,jcounter;
-     int tk;
-     int dijkstra_min;
+     int tk=v;
+     double dijkstra_min;
      int num=mgraph->node_number;
-     int dijkstra[num];
-     int selected[num]={0};
+     double dijkstra[num];
+     int selected[5000]={0};
      int pre[num];	//到达终点前经过的最近的一个点 
-
      selected[v]=1;
+     if(mgraph==NULL){
+     	return -1;
+	 }
+	 if(v>=mgraph->node_number||m>=mgraph->node_number||v<0||m<0){
+	 	return -1;
+	 }
      for(icounter=0;icounter<mgraph->node_number;icounter++)
      {
 	  dijkstra[icounter]=mgraph->edges[v][icounter];	//先给dijkstra[icounter]数组一个初始的模糊最短路径值 
-	  pre[icounter]=v;	//经过的前一个点v 
+	  pre[icounter]=v;	//经过的前一个点都是v 
      }
         
      for(icounter=0;icounter<mgraph->node_number;icounter++)
      {
-	  dijkstra_min=INF;
+	  dijkstra_min=INT_MAX;  	//最开始路与路间的距离都初始化为INT_MAX
 	  for(jcounter=0;jcounter<mgraph->node_number;jcounter++)
 	  {  
-	       if(!selected[jcounter] && dijkstra[jcounter]<dijkstra_min)
+	       if(!selected[jcounter] && dijkstra[jcounter]<dijkstra_min)	//遍历每一条path，并找出node与node间最短路径 
 	       {
 		    dijkstra_min=dijkstra[jcounter];
 		    tk=jcounter;
 	       }
 	  }
-	  selected[tk]=1;
-	  for(jcounter=0;jcounter<mgraph->n;jcounter++)
+	  selected[tk]=1;	//已经得出最短路径的点要标记为1 
+	  for(jcounter=0;jcounter<mgraph->node_number;jcounter++)
 	  {
-	       if(!selected[jcounter] && mgraph->edges[tk][jcounter]!=INF && dijkstra[tk]+mgraph->edges[tk][jcounter] < dijkstra[jcounter])
+	       if(!selected[jcounter] && mgraph->edges[tk][jcounter]!=INT_MAX && dijkstra[tk]+mgraph->edges[tk][jcounter] < dijkstra[jcounter])
 	       {
 		    dijkstra[jcounter]=dijkstra[tk]+mgraph->edges[tk][jcounter];
-		    pre[jcounter]=tk;
+		    pre[jcounter]=tk;	//将前一个经过的点记录为tk 
 	       }
 	  }
      }  
-     Dispath(dijkstra,pre,selected,mgraph->node_number,v);
+	 Dispath(dijkstra,pre,selected,mgraph->node_number,v,m);
+	 inputpath (pre,m,v); 
+	 return dijkstra[m];
 }
  
-void Dispath(int dis[],int pre[],int visited[], int n, int v)
+int Dispath(double dis[],int pre[],int selected[], int n, int v, int m)
 {
-     int i;
+     int i,y=0;
      for(i=0;i<n;i++)
      {
-	  if(visited[i])
+	  if(selected[i])
 	  {
-	       printf("从%d到%d的最短路径长度为:%d\t路径为:",v,i,dis[i]);
+	  	if(i==m)
+		{
+	       printf("从%d(序号)到%d(序号)的最短路径长度为: %lf\n路径为(序号): ",v,i,dis[i]);
 	       printf("%d, ",v);
-	       Ppath(pre,i,v);
+	       Ppath(pre,i,v);	//打印路径 
 	       printf("%d\n",i);
+	       y=1;
+	   }
 	  }
-	  else
-	       printf("no path\n");
      }
+     if(y==0){
+     	printf("no path");
+	 }
+	 return 0;
 }
+
 void Ppath(int pre[], int i, int v)
 {
      int k;
@@ -145,6 +86,33 @@ void Ppath(int pre[], int i, int v)
      if(k==v)
 	  return;
      Ppath(pre,k,v);
-     printf("%d, ",k);
+     printf("%d, ",k);	  
 }
+
+int inputpath (int pre[],int i,int v){
+	int len=sizeof(pre);
+	if(i>=len||v>=len||i<0||v<0){
+		return -1;
+	}
+	FILE *file = fopen("route.out","w");   	//以只写的方式打开文件，每次打开都会清空文件原有内容 
+	pNODE pnode_head=loadNode("Final_Map.map");   
+    int route=i;   
+    double a_Latitude,a_longtitude;   
+    while (1) {
+        pNODE a_node=findnode(route,pnode_head);
+        a_Latitude=a_node->node_lat;
+        a_longtitude=a_node->node_lgt;
+        fprintf(file," %lf %lf\n",a_longtitude,a_Latitude);		//将数据输入文件 
+        if (route==v) {		//当route=v时说明已经重新回到起点 
+            pNODE a_node=findnode(v,pnode_head);
+        	a_Latitude=a_node->node_lat;
+       		a_longtitude=a_node->node_lgt;
+            fprintf(file," %lf %lf\n",a_longtitude,a_Latitude);
+            break;
+    	}
+        route=pre[route];
+    }
+    fclose(file);
+    return 0;
+}   
 

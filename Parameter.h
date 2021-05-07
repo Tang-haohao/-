@@ -1,7 +1,7 @@
 #ifndef PARAMETER__H 
 #define PARAMETER__H
 
-#define INF         (~(0x1<<31)) 
+#define INF    (~(0x1<<31)) 
 #define MAX     5000
 
 typedef struct NODE
@@ -24,13 +24,13 @@ typedef struct PATH
 
 typedef struct MyGraph		/* 邻接表存储结构 */
 {
-     int edges[MAX][MAX];
+     double edges[MAX][MAX];	//store the ways length 
      int node_number;  //node number
 	 int edge_number;  //edge number
 } MyGraph;
 
-typedef PATH* pPATH; 
-typedef NODE* pNODE;
+typedef Path* pPATH; 
+typedef Node* pNODE;
 typedef MyGraph* pMyGraph; 
 
 #endif

@@ -429,18 +429,18 @@ int t_drawgraph(pPATH head_path,pNODE node_head){
 	return 0;		
 }																		
 																		
-int main (int argc, char* argv[]){
-	pNODE pointer_node=loadNode("Final_Map.map");	//将文件中的数据存入链表，并得到头指针 
-	pPATH pointer_path=loadPath("Final_Map.map");  
-	printf ("\n************************ Test  function ************************\n");
-	t_loadNode (pointer_node);
-	t_loadPath (pointer_path);
-	t_produceGraph(pointer_node,pointer_path);
-	t_inputpath();
-	t_findindex(pointer_node);
-	t_findnode(pointer_node);	
-	t_Dijkstra(pointer_node,pointer_path);
-	t_drawgraph(pointer_path,pointer_node);
-	return 0;
-} 
+//int main (int argc, char* argv[]){
+//	pNODE pointer_node=loadNode("Final_Map.map");	//将文件中的数据存入链表，并得到头指针 
+//	pPATH pointer_path=loadPath("Final_Map.map");  
+//	printf ("\n************************ Test  function ************************\n");
+//	t_loadNode (pointer_node);
+//	t_loadPath (pointer_path);
+//	t_produceGraph(pointer_node,pointer_path);
+//	t_inputpath();
+//	t_findindex(pointer_node);
+//	t_findnode(pointer_node);	
+//	t_Dijkstra(pointer_node,pointer_path);
+//	t_drawgraph(pointer_path,pointer_node);
+//	return 0;
+//} 
 
